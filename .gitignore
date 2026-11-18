@@ -1,0 +1,4 @@
+.env*
+*.postman_environment.json
+node_modules/
+.DS_Store

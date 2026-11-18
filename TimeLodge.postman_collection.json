@@ -1,0 +1,179 @@
+{
+    "info": {
+        "_postman_id": "51e6f661-9e94-4bdf-a9b8-73ace6da7d5c",
+        "name": "TimeLodge API starter collection",
+        "description": "Check your TimeLodge service token, then read a page of clients or time entries. Use a private Postman environment with a local sensitive variable named timelodge_api_token. The API contract is available at https://timelodge.com/openapi.json.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": "0.1.0"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{timelodge_api_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Check connection",
+            "id": "8794fb92-6ccd-49dd-8a1e-267a4fca0b08",
+            "protocolProfileBehavior": {
+                "followRedirects": false
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "https://timelodge.com/api/v1/ping",
+                    "protocol": "https",
+                    "host": ["timelodge", "com"],
+                    "path": ["api", "v1", "ping"]
+                },
+                "description": "Verify the token and check its workspace ID before reading records."
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"TimeLodge returned 200\", function () {",
+                            "  pm.response.to.have.status(200);",
+                            "});",
+                            "if (pm.response.code === 200) {",
+                            "  pm.test(\"Connection belongs to a workspace\", function () {",
+                            "    const body = pm.response.json();",
+                            "    pm.expect(body.data.ok).to.eql(true);",
+                            "    pm.expect(body.data.workspace_id).to.match(/^[0-9a-f-]{36}$/i);",
+                            "  });",
+                            "}"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "List clients",
+            "id": "3152bbde-63a4-40df-8506-6fd57d3d141f",
+            "protocolProfileBehavior": {
+                "followRedirects": false
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "https://timelodge.com/api/v1/clients?page=1&per_page=25",
+                    "protocol": "https",
+                    "host": ["timelodge", "com"],
+                    "path": ["api", "v1", "clients"],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "description": "Page number. Use meta.current_page and meta.last_page to continue."
+                        },
+                        {
+                            "key": "per_page",
+                            "value": "25",
+                            "description": "Number of records per page, from 1 to 100."
+                        }
+                    ]
+                },
+                "description": "Read a stable page of clients from your workspace. Requires clients:read."
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"TimeLodge returned 200\", function () {",
+                            "  pm.response.to.have.status(200);",
+                            "});",
+                            "if (pm.response.code === 200) {",
+                            "  pm.test(\"Response contains a page and pagination metadata\", function () {",
+                            "    const body = pm.response.json();",
+                            "    pm.expect(Array.isArray(body.data)).to.eql(true);",
+                            "    pm.expect(Number.isInteger(body.meta.current_page)).to.eql(true);",
+                            "    pm.expect(Number.isInteger(body.meta.last_page)).to.eql(true);",
+                            "  });",
+                            "}"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "List time entries",
+            "id": "07fe2b34-7eec-45e8-8823-3bf3f8d2c428",
+            "protocolProfileBehavior": {
+                "followRedirects": false
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "https://timelodge.com/api/v1/time-entries?page=1&per_page=25",
+                    "protocol": "https",
+                    "host": ["timelodge", "com"],
+                    "path": ["api", "v1", "time-entries"],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "description": "Page number. Use meta.current_page and meta.last_page to continue."
+                        },
+                        {
+                            "key": "per_page",
+                            "value": "25",
+                            "description": "Number of records per page, from 1 to 100."
+                        }
+                    ]
+                },
+                "description": "Read a stable page of recorded time from your workspace. Requires time:read."
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"TimeLodge returned 200\", function () {",
+                            "  pm.response.to.have.status(200);",
+                            "});",
+                            "if (pm.response.code === 200) {",
+                            "  pm.test(\"Response contains a page and pagination metadata\", function () {",
+                            "    const body = pm.response.json();",
+                            "    pm.expect(Array.isArray(body.data)).to.eql(true);",
+                            "    pm.expect(Number.isInteger(body.meta.current_page)).to.eql(true);",
+                            "    pm.expect(Number.isInteger(body.meta.last_page)).to.eql(true);",
+                            "  });",
+                            "}"
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
